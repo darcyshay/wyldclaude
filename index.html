@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/*
+  PULSE OS v9
+  ─────────────────────────────────────────────
+  Aesthetic: High-end Notion board meets a
+  beautifully curated personal knowledge OS.
+  Warm studio. Precise data. Alive with AI.
+
+  Palette:
+    Base     warm chalk    #f7f5f0
+    Surface  soft cream    #ffffff
+    Ink      deep walnut   #241f1a
+    Muted    warm stone    #8c8580
+    Green    forest        #2d6a4f  (primary)
+    Citrus   electric lime #b5e853  (AI accent)
+    Rust     terracotta    #b5462a  (urgency)
+    Sand     warm amber    #c9941a  (warning)
+    Mist     slate blue    #4a6fa5  (info)
+    Lavender soft violet   #7c6fcd  (Klaviyo)
+
+  Fonts:
+    Playfair Display  - editorial headings
+    Instrument Sans   - body, UI
+    IBM Plex Mono     - data, labels, code
+*/
+
+:root {
+  --chalk:      #f7f5f0;
+  --chalk-2:    #f0ede7;
+  --chalk-3:    #e8e4dc;
+  --chalk-4:    #ddd8ce;
+  --chalk-5:    #cec9bd;
+
+  --ink:        #241f1a;
+  --ink-2:      #3a342d;
+  --ink-3:      #574f47;
+  --ink-4:      #8c8580;
+  --ink-5:      #b8b2ab;
+
+  --green:      #2d6a4f;
+  --green-2:    #3d8a67;
+  --green-lt:   #c8e6d8;
+  --green-pale: #edf7f2;
+
+  --citrus:     #b5e853;
+  --citrus-dk:  #7aaa1a;
+  --citrus-pale:#f4fce6;
+
+  --rust:       #b5462a;
+  --rust-lt:    #f5d5cc;
+  --rust-pale:  #fdf2ee;
+
+  --sand:       #c9941a;
+  --sand-lt:    #f5e2b0;
+  --sand-pale:  #fdf8ee;
+
+  --mist:       #4a6fa5;
+  --mist-lt:    #cad8ee;
+  --mist-pale:  #eef3fa;
+
+  --lav:        #7c6fcd;
+  --lav-lt:     #d8d3f2;
+  --lav-pale:   #f3f2fd;
+
+  --border:     #e2ddd5;
+  --border-2:   #d4cfc6;
+
+  --serif:      'Playfair Display', Georgia, serif;
+  --sans:       'Instrument Sans', system-ui, sans-serif;
+  --mono:       'IBM Plex Mono', 'Courier New', monospace;
+
+  --sidebar-w:  256px;
+  --r:          6px;
+  --r-md:       10px;
+  --r-lg:       16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--chalk);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
+  /* Subtle dot grid like Notion */
+  background-image: radial-gradient(circle, rgba(36,31,26,.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ────────────────── LAYOUT ────────────────── */
+.shell { display: flex; min-height: 100vh; }
+
+/* ────────────────── SIDEBAR ────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: rgba(247,245,240,.96);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--chalk-4); border-radius: 2px; }
+
+.sb-top {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-wordmark {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
+.sb-wordmark span {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: var(--citrus);
+  border-radius: 50%;
+  margin-left: 3px;
+  margin-bottom: 2px;
+  box-shadow: 0 0 0 3px var(--citrus-pale);
+}
+.sb-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-5);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sb-search {
+  margin: 10px 10px 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: border-color .14s;
+}
+.sb-search:hover { border-color: var(--green-2); }
+.sb-search-text { font-size: 12px; color: var(--ink-5); font-family: var(--sans); }
+.sb-search-key {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-5);
+  background: var(--chalk-3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.sb-nav { flex: 1; padding: 6px 8px; }
+.sb-group-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink-5);
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  padding: 10px 8px 4px;
+  display: block;
+}
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: var(--r);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background .1s, color .1s;
+  line-height: 1.3;
+}
+.sb-item:hover { background: var(--chalk-3); color: var(--ink); }
+.sb-item.active { background: var(--green-pale); color: var(--green); font-weight: 500; }
+.sb-item-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-5);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.sb-item.active .sb-item-num { color: var(--green-lt); }
+.sb-tag {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .04em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.sb-tag-green { background: var(--green-lt); color: var(--green); }
+.sb-tag-rust { background: var(--rust-lt); color: var(--rust); }
+
+.sb-footer {
+  padding: 11px 14px;
+  border-top: 1px solid var(--border);
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.sb-pulse {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--citrus);
+  box-shadow: 0 0 0 3px rgba(181,232,83,.2);
+  animation: pulse-ring 2.4s ease infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-ring {
+  0%,100% { box-shadow: 0 0 0 3px rgba(181,232,83,.2); }
+  50% { box-shadow: 0 0 0 6px rgba(181,232,83,.06); }
+}
+.sb-footer-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-5);
+  letter-spacing: .04em;
+}
+
+/* ────────────────── MAIN ────────────────── */
+.main {
+  flex: 1;
+  padding: 52px 64px 96px;
+  max-width: 900px;
+  min-width: 0;
+  background: white;
+  box-shadow: -1px 0 0 var(--border);
+}
+
+/* ────────────────── SECTIONS ────────────────── */
+.sec { display: none; }
+.sec.on { display: block; animation: appear .18s ease; }
+@keyframes appear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ────────────────── PAGE HEADER ────────────────── */
+.pg-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--green);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pg-kicker::before {
+  content: '';
+  width: 20px; height: 1.5px;
+  background: var(--green);
+  display: inline-block;
+}
+.pg-title {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.16;
+  letter-spacing: -.025em;
+  margin-bottom: 12px;
+}
+.pg-title em { font-style: italic; color: var(--rust); }
+.pg-body {
+  font-size: 14px;
+  color: var(--ink-3);
+  max-width: 580px;
+  line-height: 1.78;
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+
+/* ────────────────── TYPOGRAPHY ────────────────── */
+h2 {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: -.02em;
+  margin: 36px 0 14px;
+  line-height: 1.22;
+}
+h2:first-child { margin-top: 0; }
+h3 {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  margin: 24px 0 10px;
+}
+h3:first-child { margin-top: 0; }
+
+.hr { height: 1px; background: var(--border); margin: 28px 0; }
+
+/* ────────────────── GRIDS ────────────────── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+
+/* ────────────────── NOTION-STYLE PROPERTY ROWS ────────────────── */
+.props { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; margin-bottom: 14px; }
+.prop {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  min-height: 36px;
+  border-bottom: 1px solid var(--border);
+}
+.prop:last-child { border-bottom: none; }
+.prop-key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--chalk);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.prop-val {
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  display: flex;
+  align-items: center;
+  background: white;
+}
+.prop-val.note { font-size: 12px; color: var(--ink-4); font-style: italic; align-items: flex-start; padding-top: 9px; }
+
+/* ────────────────── CARDS ────────────────── */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 20px 22px;
+  margin-bottom: 14px;
+}
+.card-chalk { background: var(--chalk); }
+.card-green { background: var(--green-pale); border-color: var(--green-lt); }
+.card-rust { background: var(--rust-pale); border-color: var(--rust-lt); }
+.card-sand { background: var(--sand-pale); border-color: var(--sand-lt); }
+.card-mist { background: var(--mist-pale); border-color: var(--mist-lt); }
+.card-lav { background: var(--lav-pale); border-color: var(--lav-lt); }
+.card-citrus { background: var(--citrus-pale); border-color: rgba(181,232,83,.4); }
+
+/* Left-border accent cards */
+.accent { border-left: 3px solid; padding-left: 18px; }
+.accent-green { border-left-color: var(--green); }
+.accent-rust { border-left-color: var(--rust); }
+.accent-sand { border-left-color: var(--sand); }
+.accent-mist { border-left-color: var(--mist); }
+.accent-lav { border-left-color: var(--lav); }
+
+/* ────────────────── KPI TILES ────────────────── */
+.kpi {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px 18px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--green), var(--citrus));
+  opacity: .5;
+}
+.kpi-num {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -.03em;
+}
+.kpi-label { font-size: 12px; font-weight: 500; color: var(--ink-3); }
+.kpi-sub { font-family: var(--mono); font-size: 9px; color: var(--ink-5); margin-top: 3px; letter-spacing: .03em; }
+
+/* ────────────────── COST ROWS ────────────────── */
+.cr {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  gap: 16px;
+}
+.cr:last-child { border-bottom: none; }
+.cr-n { color: var(--ink-2); font-weight: 400; flex: 1; line-height: 1.5; }
+.cr-v { font-family: var(--mono); font-size: 12px; color: var(--ink-4); white-space: nowrap; }
+
+/* ────────────────── BADGES ────────────────── */
+.tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 8px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+.tg { background: var(--green-pale); color: var(--green); border-color: var(--green-lt); }
+.tr { background: var(--rust-pale); color: var(--rust); border-color: var(--rust-lt); }
+.ts { background: var(--sand-pale); color: var(--sand); border-color: var(--sand-lt); }
+.tm { background: var(--mist-pale); color: var(--mist); border-color: var(--mist-lt); }
+.tv { background: var(--lav-pale); color: var(--lav); border-color: var(--lav-lt); }
+.tn { background: var(--chalk-3); color: var(--ink-3); border-color: var(--chalk-5); }
+.tc { background: var(--citrus-pale); color: var(--citrus-dk); border-color: rgba(181,232,83,.5); }
+
+/* Source chip */
+.src {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-5);
+  background: var(--chalk-3);
+  border: 1px solid var(--chalk-5);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* ────────────────── CALLOUTS ────────────────── */
+.note {
+  display: flex;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: var(--r);
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.72;
+  border-left: 3px solid;
+}
+.note-title { font-weight: 600; font-size: 12px; margin-bottom: 2px; display: block; }
+.note-green { background: var(--green-pale); border-color: var(--green); color: var(--ink-2); }
+.note-green .note-title { color: var(--green); }
+.note-rust { background: var(--rust-pale); border-color: var(--rust); color: var(--ink-2); }
+.note-rust .note-title { color: var(--rust); }
+.note-sand { background: var(--sand-pale); border-color: var(--sand); color: var(--ink-2); }
+.note-sand .note-title { color: var(--sand); }
+.note-mist { background: var(--mist-pale); border-color: var(--mist); color: var(--ink-2); }
+.note-mist .note-title { color: var(--mist); }
+.note-lav { background: var(--lav-pale); border-color: var(--lav); color: var(--ink-2); }
+.note-lav .note-title { color: var(--lav); }
+.note-chalk { background: var(--chalk-2); border-color: var(--chalk-5); color: var(--ink-2); }
+.note-chalk .note-title { color: var(--ink); }
+.note-citrus { background: var(--citrus-pale); border-color: var(--citrus-dk); color: var(--ink-2); }
+.note-citrus .note-title { color: var(--citrus-dk); }
+
+/* ────────────────── FLOW DIAGRAM ────────────────── */
+.flow-stack { display: flex; flex-direction: column; }
+.flow-node {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  position: relative;
+}
+.flow-node + .flow-node { margin-top: 24px; }
+.flow-node::after {
+  content: '';
+  position: absolute;
+  bottom: -17px; left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+}
+.flow-node:last-child::after { display: none; }
+.flow-arrow {
+  position: absolute;
+  bottom: -24px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--rust);
+  background: white;
+  padding: 0 4px;
+  z-index: 1;
+}
+.flow-node:last-child .flow-arrow { display: none; }
+.fn-kicker { font-family: var(--mono); font-size: 9px; font-weight: 500; color: var(--ink-5); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+.fn-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.fn-body { font-size: 12px; color: var(--ink-3); line-height: 1.62; }
+.fn-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--green);
+  background: var(--green-pale);
+  border: 1px solid var(--green-lt);
+  border-radius: 8px;
+  padding: 2px 9px;
+  margin-top: 6px;
+}
+.fn-hot { background: var(--green-pale); border-color: var(--green); }
+.fn-hot .fn-kicker { color: var(--green); }
+.fn-hot .fn-title { color: var(--green); }
+
+/* ────────────────── TIMELINE ────────────────── */
+.tl { position: relative; padding-left: 22px; }
+.tl::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 12px; width: 1px; background: var(--border); }
+.tl-item { position: relative; padding-bottom: 26px; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -18px; top: 3px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--green-lt);
+}
+.tl-period { font-family: var(--mono); font-size: 9px; color: var(--rust); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 3px; }
+.tl-head { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.tl-body { font-size: 13px; color: var(--ink-3); line-height: 1.85; }
+
+/* ────────────────── EMAIL CARDS ────────────────── */
+.email-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.email-top {
+  background: var(--chalk);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.email-day { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--green); letter-spacing: .06em; white-space: nowrap; }
+.email-subj { font-size: 12px; color: var(--ink-3); flex: 1; }
+.email-meta { font-family: var(--mono); font-size: 10px; color: var(--ink-5); }
+.email-text {
+  padding: 16px 18px;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.9;
+  white-space: pre-line;
+  font-weight: 400;
+}
+.email-foot { padding: 6px 18px 12px; font-family: var(--mono); font-size: 10px; color: var(--ink-5); font-style: italic; }
+.klav-strip {
+  background: var(--lav-pale);
+  border-top: 1px solid var(--lav-lt);
+  padding: 8px 18px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--lav);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.klav-pip {
+  background: var(--lav);
+  color: white;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: .06em;
+}
+
+/* ────────────────── SCRIPTS ────────────────── */
+.script-line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  background: var(--chalk);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--rust);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 13px 16px;
+  margin: 10px 0;
+  color: var(--ink-2);
+  line-height: 1.85;
+}
+.aside { font-family: var(--mono); font-size: 10px; color: var(--ink-5); font-style: italic; margin: 0 0 8px; }
+.branch {
+  background: var(--chalk-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  margin: 7px 0;
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+.branch strong { color: var(--ink); font-weight: 600; }
+
+/* ────────────────── OBJECTIONS ────────────────── */
+.obj { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.obj:last-child { border-bottom: none; padding-bottom: 0; }
+.obj-q { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--rust); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.obj-a { font-size: 13px; color: var(--ink-2); line-height: 1.75; }
+.obj-note { font-family: var(--mono); font-size: 10px; color: var(--ink-5); margin-top: 4px; font-style: italic; }
+
+/* ────────────────── CLOSER ────────────────── */
+.closer-row { padding: 12px 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 90px 1fr; gap: 16px; align-items: start; }
+.closer-row:last-child { border-bottom: none; }
+.closer-time { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--rust); padding-top: 2px; }
+.closer-body { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+.closer-note { font-size: 12px; color: var(--ink-5); font-style: italic; margin-top: 4px; }
+
+/* ────────────────── GHL FORM ────────────────── */
+.form-grid { display: grid; gap: 10px; margin-bottom: 10px; }
+.fg2 { grid-template-columns: 1fr 1fr; }
+.fg3 { grid-template-columns: 1fr 1fr 1fr; }
+.f-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 5px;
+}
+.f-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: var(--sans);
+  background: var(--chalk-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .14s, background .14s;
+}
+.f-input:focus { border-color: var(--green); background: white; box-shadow: 0 0 0 3px rgba(45,106,79,.08); }
+.f-input::placeholder { color: var(--ink-5); }
+.f-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238c8580' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+}
+.f-ta { min-height: 82px; resize: vertical; }
+.f-section-head {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: white;
+  background: var(--green);
+  padding: 5px 12px;
+  border-radius: var(--r) var(--r) 0 0;
+  margin-bottom: -1px;
+  display: inline-block;
+}
+.ghl-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: var(--r);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .14s, transform .14s;
+  margin-top: 14px;
+}
+.ghl-submit:hover { background: var(--ink-2); transform: translateY(-1px); }
+.ghl-success {
+  display: none;
+  background: var(--green-pale);
+  border: 1px solid var(--green-lt);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  align-items: center;
+  gap: 7px;
+}
+.ghl-success.show { display: flex; animation: appear .2s ease; }
+
+/* ────────────────── ACTIVITY LOG ────────────────── */
+.log-entry {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  background: white;
+  display: grid;
+  grid-template-columns: 80px 70px 1fr;
+  gap: 11px;
+  align-items: start;
+  font-size: 12px;
+}
+.log-time { font-family: var(--mono); font-size: 9px; color: var(--ink-5); padding-top: 2px; line-height: 1.4; }
+.log-body { color: var(--ink-2); line-height: 1.6; }
+
+/* ────────────────── CHECKLIST ────────────────── */
+.check-row {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all .1s;
+}
+.check-row:last-child { border-bottom: none; }
+.check-row:hover { padding-left: 4px; }
+.check-box {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--chalk-5);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .14s;
+  background: white;
+}
+.check-box.done { background: var(--green); border-color: var(--green); }
+.check-box.done::after { content: ''; width: 5px; height: 8px; border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); display: block; }
+.check-label { font-size: 13px; color: var(--ink-2); flex: 1; font-weight: 500; line-height: 1.5; }
+.check-sub { font-size: 11px; color: var(--ink-5); margin-top: 2px; }
+
+/* ────────────────── PHASE CARDS ────────────────── */
+.phase-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  background: white;
+  border-left: 3px solid;
+}
+.ph-sky { border-left-color: var(--mist); }
+.ph-green { border-left-color: var(--green); }
+.ph-rust { border-left-color: var(--rust); }
+.ph-ink { border-left-color: var(--ink); }
+.phase-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+.phase-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.phase-mrr { font-family: var(--mono); font-size: 12px; color: var(--green); font-weight: 500; }
+.phase-body { font-size: 13px; color: var(--ink-3); line-height: 1.68; }
+
+/* ────────────────── COACH ────────────────── */
+.coach {
+  background: var(--chalk-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 26px;
+  position: relative;
+  overflow: hidden;
+}
+.coach::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--rust), var(--sand), var(--green), var(--citrus));
+}
+.coach-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.coach-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--rust);
+  background: var(--rust-pale);
+  border: 1px solid var(--rust-lt);
+  padding: 4px 11px;
+  border-radius: 8px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.coach-headline { font-family: var(--serif); font-size: 21px; color: var(--ink); font-style: italic; }
+.q-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.q-pill {
+  padding: 5px 13px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: all .12s;
+  font-family: var(--sans);
+}
+.q-pill:hover { border-color: var(--green); color: var(--green); background: var(--green-pale); }
+.coach-input-row { display: flex; gap: 9px; margin-bottom: 13px; }
+.coach-field {
+  flex: 1;
+  padding: 10px 13px;
+  font-size: 13px;
+  font-family: var(--sans);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .14s;
+}
+.coach-field:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(45,106,79,.08); }
+.coach-field::placeholder { color: var(--ink-5); }
+.coach-btn {
+  padding: 10px 20px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: var(--r);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .13s;
+  white-space: nowrap;
+}
+.coach-btn:hover { background: var(--ink-2); }
+.coach-btn:disabled { background: var(--chalk-4); color: var(--ink-5); cursor: not-allowed; }
+.coach-result {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 15px 17px;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink-2);
+  line-height: 1.85;
+  display: none;
+}
+.coach-result.show { display: block; animation: appear .18s ease; }
+.thinking { display: none; align-items: center; gap: 8px; padding: 9px 0; font-family: var(--mono); font-size: 10px; color: var(--ink-5); text-transform: uppercase; letter-spacing: .08em; }
+.thinking.show { display: flex; }
+.thinking-dots span { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--green); margin: 0 2px; animation: bob .8s infinite; }
+.thinking-dots span:nth-child(2) { animation-delay: .16s; }
+.thinking-dots span:nth-child(3) { animation-delay: .32s; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+.offline-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--sand);
+  background: var(--sand-pale);
+  border: 1px solid var(--sand-lt);
+  border-radius: var(--r);
+  padding: 8px 12px;
+  margin-top: 10px;
+  display: none;
+}
+
+/* ────────────────── COMMS TABLE ────────────────── */
+.comms-row {
+  display: grid;
+  grid-template-columns: 120px 72px 1fr;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+  font-size: 13px;
+}
+.comms-row:last-child { border-bottom: none; }
+.comms-tool { font-weight: 600; color: var(--ink); font-size: 13px; line-height: 1.35; }
+.comms-body { color: var(--ink-3); line-height: 1.7; }
+
+/* ────────────────── ICP TABLE ────────────────── */
+.icp-table { width: 100%; border-collapse: collapse; }
+.icp-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  padding: 0 12px 10px 0;
+  border-bottom: 1.5px solid var(--ink);
+  text-align: left;
+}
+.icp-table td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+.icp-table tr:last-child td { border-bottom: none; }
+
+/* ────────────────── SCROLLBAR ────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--chalk-4); border-radius: 3px; }
+
+@media (max-width: 820px) {
+  .sidebar { display: none; }
+  .main { padding: 30px 20px 60px; max-width: 100%; box-shadow: none; }
+  .g2,.g3,.g4,.fg2,.fg3 { grid-template-columns: 1fr; }
+  .prop,.comms-row,.log-entry,.closer-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ========== SIDEBAR ========== -->
+<nav class="sidebar">
+  <div class="sb-top">
+    <div class="sb-wordmark">Pulse OS<span></span></div>
+    <div class="sb-sub">AI Sales Operating System</div>
+  </div>
+
+  <div class="sb-search">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.5" stroke="#b8b2ab" stroke-width="1.2"/><path d="M8 8l2 2" stroke="#b8b2ab" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <span class="sb-search-text">Quick find</span>
+    <span class="sb-search-key">K</span>
+  </div>
+
+  <div class="sb-nav">
+    <span class="sb-group-label">Overview</span>
+    <button class="sb-item active" onclick="go('home')"><span class="sb-item-num">00</span>Dashboard</button>
+    <button class="sb-item" onclick="go('system')"><span class="sb-item-num">01</span>System map</button>
+    <button class="sb-item" onclick="go('icp')"><span class="sb-item-num">02</span>ICP targets</button>
+
+    <span class="sb-group-label">Comms + Deploy</span>
+    <button class="sb-item" onclick="go('comms')"><span class="sb-item-num">03</span>Full comms stack</button>
+    <button class="sb-item" onclick="go('handoff')"><span class="sb-item-num">04</span>Deploy + handoff</button>
+
+    <span class="sb-group-label">Email Engine</span>
+    <button class="sb-item" onclick="go('email-flow')"><span class="sb-item-num">05</span>Full workflow<span class="sb-tag sb-tag-green">Apollo</span></button>
+    <button class="sb-item" onclick="go('klaviyo')"><span class="sb-item-num">06</span>Klaviyo integration</button>
+    <button class="sb-item" onclick="go('sequences')"><span class="sb-item-num">07</span>Email sequences</button>
+
+    <span class="sb-group-label">Sales Playbooks</span>
+    <button class="sb-item" onclick="go('scripts')"><span class="sb-item-num">08</span>Call scripts</button>
+    <button class="sb-item" onclick="go('objections')"><span class="sb-item-num">09</span>Objections</button>
+    <button class="sb-item" onclick="go('closer')"><span class="sb-item-num">10</span>Closer script</button>
+
+    <span class="sb-group-label">Pipeline + Ops</span>
+    <button class="sb-item" onclick="go('ghl')"><span class="sb-item-num">11</span>Contact logging<span class="sb-tag sb-tag-green">Deep</span></button>
+    <button class="sb-item" onclick="go('workflow')"><span class="sb-item-num">12</span>Daily SOP</button>
+    <button class="sb-item" onclick="go('onboarding')"><span class="sb-item-num">13</span>Operator checklist</button>
+    <button class="sb-item" onclick="go('budget')"><span class="sb-item-num">14</span>Budget + KPIs</button>
+
+    <span class="sb-group-label">AI Tools</span>
+    <button class="sb-item" onclick="go('coach')"><span class="sb-item-num">15</span>Live coach<span class="sb-tag sb-tag-rust">Live</span></button>
+    <button class="sb-item" onclick="go('scale')"><span class="sb-item-num">16</span>Scale roadmap</button>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-pulse"></div>
+    <span class="sb-footer-label">v9.0 - System active - WPB</span>
+  </div>
+</nav>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="main">
+
+
+<!-- ███ [00] DASHBOARD ███ -->
+<div id="sec-home" class="sec on">
+  <div class="pg-kicker">Dashboard - 00</div>
+  <h1 class="pg-title">Revenue velocity.<br><em>Not vanity metrics.</em></h1>
+  <p class="pg-body">The implementation team builds, deploys, and manages this system. The client runs the sales side - attending meetings and closing deals. Apollo feeds the pipeline nightly. Claude handles the production work. GHL connects everything.</p>
+
+  <div class="g4">
+    <div class="kpi"><div class="kpi-num">100</div><div class="kpi-label">Dials / day</div><div class="kpi-sub">operator target</div></div>
+    <div class="kpi"><div class="kpi-num">200+</div><div class="kpi-label">Emails / day</div><div class="kpi-sub">automated</div></div>
+    <div class="kpi"><div class="kpi-num">5-10</div><div class="kpi-label">Meetings / week</div><div class="kpi-sub">combined channels</div></div>
+    <div class="kpi"><div class="kpi-num">~2 hrs</div><div class="kpi-label">Manager time / day</div><div class="kpi-sub">after full launch</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h3>Research benchmarks</h3>
+      <div class="cr"><span class="cr-n">Cold email ROI per $1 spent</span><span class="cr-v">$36<span class="src">Cleverly 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Platform avg reply rate</span><span class="cr-v">3.43%<span class="src">Instantly 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Top performer reply rate</span><span class="cr-v">10%+<span class="src">Martal 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Omnichannel vs email-only lift</span><span class="cr-v">287%<span class="src">Martal 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Speed-to-lead advantage at 5 min</span><span class="cr-v">21x<span class="src">HubSpot 2024</span></span></div>
+      <div class="cr"><span class="cr-n">FTC fine per violation per day</span><span class="cr-v">$53,088<span class="src">WardsAuto</span></span></div>
+    </div>
+    <div class="card card-green">
+      <h3 style="color:var(--green)">Revenue model</h3>
+      <div class="cr" style="border-color:var(--green-lt)"><span class="cr-n">1 close / month</span><span class="cr-v" style="color:var(--green);font-weight:500">$1.5-3k MRR</span></div>
+      <div class="cr" style="border-color:var(--green-lt)"><span class="cr-n">3 closes / month</span><span class="cr-v" style="color:var(--green);font-weight:500">$4.5-9k MRR</span></div>
+      <div class="cr" style="border-color:var(--green-lt)"><span class="cr-n">5 closes / month</span><span class="cr-v" style="color:var(--green);font-weight:500">$7.5-15k MRR</span></div>
+      <div class="cr" style="border-color:var(--green-lt)"><span class="cr-n">Break-even</span><span class="cr-v">1 close @ $3k MRR</span></div>
+      <div class="cr" style="border-top:2px solid var(--green-lt);margin-top:5px;padding-top:10px;border-bottom:none"><span class="cr-n" style="font-weight:600;color:var(--ink)">Gross margin at scale</span><span class="cr-v" style="color:var(--rust);font-size:13px;font-weight:500">65-80%</span></div>
+    </div>
+  </div>
+
+  <div class="note note-chalk">
+    <div><span class="note-title">Roles in this system</span>The <strong>implementation team</strong> builds the machine: all platforms, automations, Apollo filters, Claude API roles, and operator training. The <strong>operator</strong> runs daily outreach: dials, routes hot replies, and logs every touchpoint to GHL. The <strong>client</strong> is the salesperson: they attend assessments, present the compliance report, and close the deal. Clear lanes. No overlap.</div>
+  </div>
+</div>
+
+
+<!-- ███ [01] SYSTEM MAP ███ -->
+<div id="sec-system" class="sec">
+  <div class="pg-kicker">Overview - 01</div>
+  <h1 class="pg-title">Five layers.<br><em>One machine.</em></h1>
+
+  <div class="card accent accent-mist">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--mist);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Layer 01 - Data engine</div>
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">Apollo.io</div><div class="prop-val">Saved ICP filters run nightly per vertical. Exports 50-100 verified contacts to Smartlead and GHL. Enrichment data (LinkedIn, company size, tech stack, address, phone) pre-populates every GHL contact record before first outreach. Deduplication prevents re-contacting anyone in the system.</div></div>
+      <div class="prop"><div class="prop-key">NeverBounce</div><div class="prop-val">Every contact email verified before entering any sequence. Bounce rate held below 2%. Runs automatically as contacts flow in from Apollo.</div></div>
+    </div>
+  </div>
+
+  <div class="card accent accent-green">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Layer 02 - AI email (two platforms)</div>
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">Smartlead</div><div class="prop-val">Cold outreach only. Day 1/4/7/11 cadence to net-new contacts. Claude Haiku writes personalized first lines per contact. Reply detection triggers GHL automation. All events logged with timestamps.</div></div>
+      <div class="prop"><div class="prop-key">Klaviyo</div><div class="prop-val">Warm nurture only. Five automated flows for engaged contacts: Assessment Booked, Post-Assessment, Monthly Nurture, Closed Won, Closed Lost. Triggered by GHL tags via Zapier. Never used for cold outreach.</div></div>
+    </div>
+  </div>
+
+  <div class="card accent accent-rust">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--rust);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Layer 03 - Operator execution</div>
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">PhoneBurner</div><div class="prop-val">100 dials per day across two call blocks. GHL notes preloaded per contact. Claude objection coach open in second browser tab. All dispositions auto-sync to GHL via Zapier.</div></div>
+      <div class="prop"><div class="prop-key">Pavement route</div><div class="prop-val">Every Friday. Okeechobee Blvd corridor, WPB. 8-12 stops. Compliance one-pager with QR to Calendly. Every visit logged as Walk-in Touch in GHL with contact details collected.</div></div>
+    </div>
+  </div>
+
+  <div class="card accent accent-sand">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--sand);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Layer 04 - Pipeline routing (GHL automations, zero manual steps)</div>
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">On reply</div><div class="prop-val">Hot tag applied. Slack alert fires within 2 min. Claude Sonnet drafts personalized reply pulling from GHL contact data. Operator approves. Calendly link sent. Stage updated. Klaviyo flow triggered on booking.</div></div>
+      <div class="prop"><div class="prop-key">Day 14 no reply</div><div class="prop-val">Nurture tag applied. Contact exits all Smartlead sequences. Zapier adds contact to Klaviyo Monthly Nurture list. One compliance news email per month for 6 months. Re-qualifies on any Calendly click.</div></div>
+    </div>
+  </div>
+
+  <div class="card accent accent-lav">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--lav);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Layer 05 - Claude AI production roles</div>
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">Sales coach</div><div class="prop-val">Haiku runs in browser tab during every call. Objection in, rebuttal out in under 2 seconds. ~$14/mo at 100 calls/day.</div></div>
+      <div class="prop"><div class="prop-key">Copywriter</div><div class="prop-val">Sonnet drafts personalized follow-up emails from 3-5 word call notes in GHL. ~$18/mo at 100 drafts/day.</div></div>
+      <div class="prop"><div class="prop-key">Compliance analyst</div><div class="prop-val">Sonnet generates FTC Risk Reports from assessment findings. 90 seconds per report. ~$6/mo at 20 reports/month.</div></div>
+      <div class="prop"><div class="prop-key">Proposal writer</div><div class="prop-val">Sonnet or Opus builds full proposals same-day from discovery call notes. ~$5/mo standard volume.</div></div>
+      <div class="prop"><div class="prop-key">Email strategist</div><div class="prop-val">Haiku writes unique first-line personalization per contact before any sequence launches. ~$3/mo at 200 contacts/day.</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ███ [02] ICP ███ -->
+<div id="sec-icp" class="sec">
+  <div class="pg-kicker">Overview - 02</div>
+  <h1 class="pg-title">4,750+ businesses.<br><em>One compliance hook each.</em></h1>
+
+  <div class="note note-green">
+    <div><span class="note-title">Apollo rotation schedule</span>Auto dealers first (week 1, Apollo filter: automotive + financing offered + WPB 50mi). Medical/dental at week 4. CPAs and financial advisors at month 2. Each vertical gets its own Apollo saved filter, Smartlead campaign, and Klaviyo flow set. Rotate Apollo filters weekly to avoid list fatigue.</div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:16px 20px 0">
+      <table class="icp-table">
+        <thead><tr>
+          <th style="width:155px">Vertical</th>
+          <th>Compliance hook</th>
+          <th style="text-align:right;width:70px">PBC est.</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Franchised dealers</td><td style="color:var(--ink-3);font-size:12px">FTC Safeguards, 9 requirements, $53k/day, breach reporting May 2024</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">300+</td></tr>
+          <tr><td style="font-weight:600">Independent dealers</td><td style="color:var(--ink-3);font-size:12px">Same FTC Safeguards if financing offered. Higher urgency. Easier gatekeepers.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">700+</td></tr>
+          <tr><td style="font-weight:600">Medical / dental</td><td style="color:var(--ink-3);font-size:12px">HIPAA Security Rule, $100-$50k per violation. 2024 proposed rule tightening ePHI.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">1,200+</td></tr>
+          <tr><td style="font-weight:600">Financial advisors</td><td style="color:var(--ink-3);font-size:12px">GLBA Safeguards plus SEC cybersecurity rule 2023. $100k per violation.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">500+</td></tr>
+          <tr><td style="font-weight:600">CPAs / accountants</td><td style="color:var(--ink-3);font-size:12px">IRS WISP mandatory for all tax preparers. Enforcement rising since 2023.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">400+</td></tr>
+          <tr><td style="font-weight:600">Law firms</td><td style="color:var(--ink-3);font-size:12px">Florida Bar cybersecurity obligations plus ABA Rule 1.6.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">600+</td></tr>
+          <tr><td style="font-weight:600">Insurance agencies</td><td style="color:var(--ink-3);font-size:12px">GLBA Safeguards plus FL OIR cybersecurity rules.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">350+</td></tr>
+          <tr><td style="font-weight:600">Realtors / brokers</td><td style="color:var(--ink-3);font-size:12px">GLBA applies. NAR data security policy. Active luxury WPB market.</td><td style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:right;font-weight:500">900+</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:10px 20px;border-top:1px solid var(--border);margin-top:14px;font-family:var(--mono);font-size:9px;color:var(--ink-5)">Total PBC addressable: 4,750+ contacts. Apollo filter rotation prevents list fatigue. New vertical unlocks 400-1,200 fresh contacts.</div>
+  </div>
+</div>
+
+
+<!-- ███ [03] COMMS STACK ███ -->
+<div id="sec-comms" class="sec">
+  <div class="pg-kicker">Comms + Deploy - 03</div>
+  <h1 class="pg-title">Every platform.<br><em>One clear job each.</em></h1>
+
+  <div class="note note-chalk">
+    <div><span class="note-title">The rule</span>Slack is internal and fast. GHL is the client's command center. Apollo is the data engine. Smartlead is cold email only. Klaviyo is warm nurture only. SMS is urgent alerts. Calendly is bookings. Loom is async training. Claude handles anything requiring intelligence. Nothing duplicates.</div>
+  </div>
+
+  <div class="card">
+    <div class="comms-row">
+      <div><div class="comms-tool">Apollo.io</div><span class="tag tg">Data engine</span></div>
+      <div><span class="tag tn">Impl. team</span></div>
+      <div class="comms-body">The data foundation for the entire system. Nightly ICP filters export 50-100 verified contacts into Smartlead and GHL simultaneously. Enrichment data pre-populates every GHL record. Implementation team manages all Apollo saved filters per vertical. Operator never touches Apollo directly.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">Slack</div><span class="tag tn">Internal</span></div>
+      <div><span class="tag tn">Impl. team</span></div>
+      <div class="comms-body">Internal team channel plus one dedicated shared channel per client. Client manager added to their channel. GHL automations fire hot lead alerts here. Implementation team uses Slack for all build communication, escalations, and client updates during ramp.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">GoHighLevel</div><span class="tag tg">Client hub</span></div>
+      <div><span class="tag tg">Client</span></div>
+      <div class="comms-body">The client's entire daily interface. Every email, call, visit, meeting, and deal outcome logged here automatically. Client checks GHL once each morning. Implementation team retains admin access permanently for quality control and rapid fixes.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">Smartlead</div><span class="tag tr">Cold email</span></div>
+      <div><span class="tag tr">Prospects</span></div>
+      <div class="comms-body">Automated cold outreach to net-new contacts only. Day 1/4/7/11 cadence. Claude Haiku personalizes every first line. Reply detection triggers GHL automation A within minutes. Implementation team retains admin for domain health, list management, and sequence optimization.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">Klaviyo</div><span class="tag tv">Warm nurture</span></div>
+      <div><span class="tag tv">Warm leads</span></div>
+      <div class="comms-body">Warm lifecycle email for anyone who has engaged. Five flows triggered by GHL tags via Zapier. Never used for cold outreach. Smartlead handles cold. Klaviyo handles warm. Mixing them breaks deliverability.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">SMS (via GHL)</div><span class="tag tv">Alerts</span></div>
+      <div><span class="tag tm">Client + operator</span></div>
+      <div class="comms-body">Real-time alerts only: hot email reply, meeting booked, high-value prospect engaged. The 21x speed-to-lead advantage lives here. Configure in GHL automations during week 2. No other SMS use - clean signals only.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">Calendly</div><span class="tag tm">Booking</span></div>
+      <div><span class="tag tm">Prospects</span></div>
+      <div class="comms-body">Single booking link in all emails and call scripts. Connects to client's Google Calendar. Confirms to prospects automatically. Implementation team sets this up in week 1 and verifies the GHL automation fires before full launch.</div>
+    </div>
+    <div class="comms-row">
+      <div><div class="comms-tool">Loom</div><span class="tag ts">Training</span></div>
+      <div><span class="tag tn">Operator</span></div>
+      <div class="comms-body">Implementation team records all operator training asynchronously: system overview, GHL walkthrough, Smartlead dashboard, objection coach tutorial, PhoneBurner setup, and pavement route guide. Operator watches on their schedule. Stored per client in a shared Loom workspace.</div>
+    </div>
+    <div class="comms-row" style="border-bottom:none">
+      <div><div class="comms-tool">PhoneBurner</div><span class="tag tr">Dialing</span></div>
+      <div><span class="tag tr">Prospects</span></div>
+      <div class="comms-body">Operator dials 100 contacts per day from Apollo-sourced lists loaded in PhoneBurner. Call recordings sync to GHL. Dispositions auto-update CRM via Zapier. Local (561) area code improves answer rates across Palm Beach County.</div>
+    </div>
+  </div>
+
+  <h2>After handoff: how the implementation team stays in it</h2>
+  <div class="card card-green">
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">Admin access</div><div class="prop-val">Implementation team retains admin in Apollo, GHL, Smartlead, and Klaviyo for every client deployed. Non-negotiable. This is how fast fixes happen and quality is maintained long-term.</div></div>
+      <div class="prop"><div class="prop-key">Shared Slack</div><div class="prop-val">One channel per client. Client manager added. Same-business-day response SLA after formal handoff.</div></div>
+      <div class="prop"><div class="prop-key">Monthly review</div><div class="prop-val">30-minute call. Review KPIs, address bottlenecks, rotate Apollo ICP filter, optimize sequences. Primary relationship touchpoint post-handoff.</div></div>
+      <div class="prop"><div class="prop-key">Emergency SLA</div><div class="prop-val">If bounce rate exceeds 5% or the system stops producing meetings for 5+ days, client contacts implementation lead directly. 4-hour response during business hours.</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ███ [04] DEPLOY + HANDOFF ███ -->
+<div id="sec-handoff" class="sec">
+  <div class="pg-kicker">Comms + Deploy - 04</div>
+  <h1 class="pg-title">Implementation team builds.<br><em>Client operates.</em></h1>
+  <p class="pg-body">The handoff is a formal event, not a handwave. The client receives a trained operator, a live system producing meetings, and this document as their operating manual. Implementation team retains admin access and provides a 90-day ramp support window.</p>
+
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-period">Weeks 1-2 - Implementation team only</div>
+      <div class="tl-head">Full infrastructure build</div>
+      <div class="tl-body">Apollo ICP filters created per vertical and tested. Smartlead campaigns wired to Apollo export. GHL pipeline stages and automations A-D built and tested with dummy contacts. Sending domains purchased and warmup started (4-week clock begins). Klaviyo flows 1-4 built and wired via Zapier to GHL tags. All Claude API roles configured with system prompts. Shared Slack channel created, client manager added.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">Week 3 - Implementation team leads, client observes</div>
+      <div class="tl-head">Operator onboarding + soft launch</div>
+      <div class="tl-body">Operator hired. Implementation team delivers 6-8 Loom training videos covering every platform. Live 30-minute objection drill on video: implementation team plays the DM, operator uses coach tool. Email soft launch: 30 per day per mailbox. Monitor bounce and open rates 72 hours. Operator ramps to 50 dials per day. First Friday pavement route planned.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">Week 4 - Full launch, implementation team supervises</div>
+      <div class="tl-head">System at full volume</div>
+      <div class="tl-body">Operator hits 100 dials per day across two call blocks. Email scales to 40-50 per day per mailbox. First meetings booking and flowing to client calendar. Client gets real-time SMS on every booking. Implementation team monitors GHL and Smartlead metrics daily. Klaviyo warm sequences live for assessment-booked contacts.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">Month 2 - Formal handoff</div>
+      <div class="tl-head">Client operates independently</div>
+      <div class="tl-body">This OS document delivered as the client's operating manual. Client manager confirmed in GHL operator role. Monthly review call cadence established. Implementation team moves to background support. First close target achieved - system breaks even.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">Month 3+ - Ongoing</div>
+      <div class="tl-head">Implementation team in retainer mode</div>
+      <div class="tl-body">Optional $1-2.5k/mo retainer for operator management, Apollo list refreshes, and sequence optimization. Monthly review: KPIs, ICP rotation, Klaviyo performance. Implementation team admin retained permanently. Client scales using this document.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ███ [05] EMAIL FLOW ███ -->
+<div id="sec-email-flow" class="sec">
+  <div class="pg-kicker">Email Engine - 05</div>
+  <h1 class="pg-title">Apollo feeds the engine.<br><em>Two platforms close the loop.</em></h1>
+  <p class="pg-body">Apollo builds the list nightly. Smartlead handles cold outreach. Klaviyo handles warm nurture. GHL connects every touchpoint. The operator manages exceptions. Claude drafts replies. The client shows up to meetings.</p>
+
+  <div class="note note-chalk">
+    <div><span class="note-title">Why two email platforms</span>Cold email platforms (Smartlead) send from individual SMTP-authenticated inboxes that mimic 1-to-1 outreach. Marketing platforms (Klaviyo) use shared IP pools that ESPs route directly to Promotions or Spam for cold contacts. Mixing the two platforms breaks deliverability on both. Right tool for right audience at every stage.</div>
+  </div>
+
+  <div class="card">
+    <div class="flow-stack">
+      <div class="flow-node">
+        <div class="fn-kicker">Nightly / Automated - Apollo saved filter runs</div>
+        <div class="fn-title">Apollo exports 50-100 new ICP contacts to Smartlead and GHL simultaneously</div>
+        <div class="fn-body">Saved Apollo search criteria: Title contains (GM, General Manager, Owner, Dealer Principal, IT Director), Industry (Automotive), Location (West Palm Beach, FL 50mi radius), Email verified = true, Not in GHL = true. Apollo runs the filter on a nightly schedule. Every new contact gets a full GHL record auto-created: name, title, company, phone, email, LinkedIn URL, company size, address, and tech stack. Deduplication prevents any contact being reached twice. Zero human input required after initial filter setup.</div>
+        <div class="fn-chip">Apollo enrichment data populates GHL before first send</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node">
+        <div class="fn-kicker">Day 0 - NeverBounce + Claude Haiku personalization</div>
+        <div class="fn-title">Email verification then unique AI first-line per contact</div>
+        <div class="fn-body">NeverBounce cleans every imported contact before any sequence begins. Invalid and risky emails removed - bounce rate held below 2%. Then Claude Haiku writes a unique opening sentence for each contact using their company name, city, vertical, and whether they offer financing. "Hi Michael, noticed Palm Beach Toyota processes vehicle financing - that puts you squarely under the FTC Safeguards Rule." GHL contact tagged by ICP vertical with timestamp.</div>
+        <div class="fn-chip">~$0.0005 per personalized line. ~$3/mo at 200 contacts/day.</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node">
+        <div class="fn-kicker">Day 1 - Smartlead sends, GHL logs with timestamp + open tracking</div>
+        <div class="fn-title">Email 1 - awareness opener, no booking link</div>
+        <div class="fn-body">Under 90 words. FTC compliance fact plus local context plus one genuine question. No Calendly in Email 1 - lower friction maximizes reply rate. Send window: 9:30-11:30am recipient local time (Martal 2026 benchmark). Every open and click logged to GHL automatically with device type, location, and timestamp.</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node">
+        <div class="fn-kicker">Day 4 - Smartlead sends</div>
+        <div class="fn-title">Email 2 - specific gap + first Calendly link</div>
+        <div class="fn-body">Names the single most common compliance gap for their vertical. Proves expertise before asking for time. First Calendly link appears here. Belkins 2023: 3-email sequences achieve 9.2% reply rate - highest of any sequence length. GHL task auto-created if 3+ opens with no reply.</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node">
+        <div class="fn-kicker">Day 7 - Smartlead sends</div>
+        <div class="fn-title">Email 3 - local peer social proof</div>
+        <div class="fn-body">References a real WPB-area business with a specific compliance gap. Rotate local area names weekly: Lake Worth, Boca, Wellington, Delray. Martal 2026: emailing multiple contacts at the same company increases response 93% vs single-contact - consider adding a second contact at this business on Day 7 in Apollo and routing them into the same sequence.</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node">
+        <div class="fn-kicker">Day 11 - Smartlead sends</div>
+        <div class="fn-title">Email 4 - breakup with free resource</div>
+        <div class="fn-body">Graceful exit with a genuine FTC checklist PDF as a resource. No sales pressure. Breakup emails consistently generate the most replies of any email in a sequence. GHL Nurture tag fires if no reply within 3 days of this send.</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node fn-hot">
+        <div class="fn-kicker">Branch A - Reply detected at any point</div>
+        <div class="fn-title">Hot routing: Smartlead reply fires GHL automation A</div>
+        <div class="fn-body">GHL tags contact Hot within 2 minutes. Slack alert fires to operator channel. Claude Sonnet pulls the contact's full GHL profile (company, vertical, DMS, prior touchpoints) and drafts a personalized reply. Operator reviews and approves - typically takes under 60 seconds. Calendly link sent. On booking: contact exits Smartlead sequences, Klaviyo Assessment Booked flow triggers via Zapier. Stage updated in GHL pipeline.</div>
+      </div>
+      <div class="flow-arrow">v</div>
+      <div class="flow-node">
+        <div class="fn-kicker">Branch B - Day 14, no reply</div>
+        <div class="fn-title">Nurture: Smartlead stops, Klaviyo takes over</div>
+        <div class="fn-body">Contact tagged Nurture in GHL. Zapier fires: contact added to Klaviyo Monthly Nurture list. One real compliance news email per month for 6 months. No hard sales ask. Any Calendly click auto-graduates contact to Assessment Booked flow. Leads that say no now say yes 3-6 months later after a market event or competitor situation.</div>
+        <div class="fn-chip">6-month Klaviyo monthly sequence begins automatically</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ███ [06] KLAVIYO ███ -->
+<div id="sec-klaviyo" class="sec">
+  <div class="pg-kicker">Email Engine - 06</div>
+  <h1 class="pg-title">Cold stays cold.<br><em>Warm goes to Klaviyo.</em></h1>
+
+  <div class="note note-lav">
+    <div><span class="note-title">Why Klaviyo is not used for cold outreach</span>Klaviyo uses shared IP infrastructure and prohibits sending to contacts who have not engaged. Using it for cold B2B outreach lands every email in spam and risks account suspension. Smartlead handles cold. Klaviyo handles warm. The two platforms serve two distinct audiences and must not be mixed.</div>
+  </div>
+
+  <h2>Five triggers that move a contact from Smartlead to Klaviyo</h2>
+  <div class="card">
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">Assessment booked</div><div class="prop-val">Prospect replied and booked via Calendly. GHL tags "Assessment Booked." Zapier adds to Klaviyo "Warm Active" list and enrolls in Flow 1: confirmation, reminder, post-meeting follow-up.</div></div>
+      <div class="prop"><div class="prop-key">Assessment attended</div><div class="prop-val">Client marks meeting outcome in GHL. Contact enters Klaviyo Flow 2: proposal summary, objection-address email, urgency touch, final check-in over 14 days.</div></div>
+      <div class="prop"><div class="prop-key">Day 14 no reply</div><div class="prop-val">Smartlead sequence complete. Zapier adds to Klaviyo "Monthly Nurture" list. One real compliance news email per month for 6 months. Any Calendly click re-routes to Flow 1 automatically.</div></div>
+      <div class="prop"><div class="prop-key">Closed won</div><div class="prop-val">Client signed. Enters Klaviyo Flow 4: 30/60/90-day check-ins, Month 3 upsell intro, Month 6 referral ask, Month 12 contract renewal prompt.</div></div>
+      <div class="prop"><div class="prop-key">Closed lost</div><div class="prop-val">Enters Klaviyo Flow 5: 90-day pause then 3-email re-qualification. "A business near you just had a compliance audit triggered by a competitor complaint." Re-qualifies on any engagement.</div></div>
+    </div>
+  </div>
+
+  <div class="note note-green">
+    <div><span class="note-title">GHL to Klaviyo wiring (Zapier)</span>No native GHL-Klaviyo integration exists. Zapier is the bridge. One Zap per trigger type. All built during week 2. GHL tag applied triggers Zapier, which creates or updates the Klaviyo profile and adds the contact to the corresponding flow list. Data passed: name, email, business name, vertical, pipeline stage, risk level, number of compliance gaps found. Klaviyo uses these fields to personalize every flow email dynamically.</div>
+  </div>
+</div>
+
+
+<!-- ███ [07] SEQUENCES ███ -->
+<div id="sec-sequences" class="sec">
+  <div class="pg-kicker">Email Engine - 07</div>
+  <h1 class="pg-title">Four emails.<br><em>One ask.</em></h1>
+  <p class="pg-body">Research-optimized: 50-125 words (50% higher reply rate vs. longer formats per Martal/Instantly 2026). Monday launch with Wednesday follow-up. 9:30-11:30am send window. Apollo data makes every first line unique. Lead with genuine value.</p>
+
+  <h3>Sequence A - Auto dealers (FTC Safeguards) via Smartlead</h3>
+
+  <div class="email-card">
+    <div class="email-top"><span class="email-day">Email 1 / Day 1</span><span class="email-subj">Subject: quick heads up for [Dealership Name]</span><span class="email-meta">~90 words</span></div>
+    <div class="email-text">Hi [First Name],
+
+I work with dealerships in the Palm Beach area on FTC data security, and I wanted to give you a heads up before a competitor mentions it first.
+
+The FTC Safeguards Rule added 9 new technical requirements in June 2023. Most dealers we speak with in South Florida are still missing at least 3 of them. The penalties run up to $53,000 per violation, per day, and the FTC can audit without a breach occurring.
+
+Not trying to alarm you. Just want to make sure you have the information.
+
+Worth a 30-minute call to see where [Dealership Name] stands?
+
+[Name]</div>
+    <div class="email-foot">// Apollo filter confirms financing offered = true before this contact is sequenced. No Calendly in Email 1 - lower friction. Send Mon-Wed, 9:30-11:30am local time. All opens and clicks auto-logged to GHL.</div>
+  </div>
+
+  <div class="email-card">
+    <div class="email-top"><span class="email-day">Email 2 / Day 4</span><span class="email-subj">Subject: the gap most Palm Beach dealers have</span><span class="email-meta">~75 words</span></div>
+    <div class="email-text">Hi [First Name],
+
+Following up from last week.
+
+Of the 9 FTC requirements, the one we find missing most often in South Florida dealerships: no written incident response plan. It is required, fully documentable, and the first thing auditors look for.
+
+If you do not have one, it takes about 30 minutes in an assessment to address.
+
+Free, remote, no IT access required: [Calendly link]
+
+[Name]</div>
+    <div class="email-foot">// Specific = credible. First Calendly link. Belkins 2023: 3-email sequences achieve 9.2% reply rate, highest of any sequence length tested.</div>
+  </div>
+
+  <div class="email-card">
+    <div class="email-top"><span class="email-day">Email 3 / Day 7</span><span class="email-subj">Subject: a dealership near you</span><span class="email-meta">~80 words</span></div>
+    <div class="email-text">Hi [First Name],
+
+One more note.
+
+We just wrapped an assessment for a dealer in [nearby area: Lake Worth / Boca / Wellington / Delray]. They had 4 compliance gaps, including outdated vendor agreements and no MFA on their DMS. None of it took long to fix, but they would not have known without the review.
+
+Wanted to mention it in case it prompts a second look for [Dealership Name].
+
+[Calendly link] if you would like the same review.
+
+[Name]</div>
+    <div class="email-foot">// Local peer reference. Rotate WPB-area cities weekly from Apollo geography data. On Day 7 also pull a second contact at this dealership from Apollo and route them into Day 1 of this sequence - multi-contact outreach lifts response 93% (Martal 2026).</div>
+  </div>
+
+  <div class="email-card">
+    <div class="email-top"><span class="email-day">Email 4 / Day 11</span><span class="email-subj">Subject: leaving you with something useful</span><span class="email-meta">~65 words</span></div>
+    <div class="email-text">Hi [First Name],
+
+I will not keep following up after this.
+
+Whether or not we ever connect, here is the FTC Safeguards checklist we use internally. It is free and covers all 9 requirements: [checklist link]
+
+If compliance comes up again down the road, you know where to find us.
+
+[Name]
+[Company] / [Phone]</div>
+    <div class="email-foot">// Breakup email with a resource. Consistently generates the most replies of any email in the sequence. GHL Nurture tag fires 3 days after this send if no reply.</div>
+    <div class="klav-strip"><span class="klav-pip">KLAVIYO</span>No reply by Day 14: exits Smartlead, enters Klaviyo Monthly Nurture (6 months, one compliance news email/month, no hard ask)</div>
+  </div>
+
+  <div class="hr"></div>
+  <h3>Klaviyo monthly nurture - all verticals, 6 emails total</h3>
+  <div class="email-card">
+    <div class="email-top"><span class="email-day">Klaviyo / Monthly</span><span class="email-subj">Subject: [Month] compliance update for [Vertical]</span><span class="email-meta">~55 words</span></div>
+    <div class="email-text">Hi [First Name],
+
+One relevant update this month: [1-sentence compliance news item].
+
+No action required. Just keeping you in the loop.
+
+If compliance is on your radar, free assessments are still available: [Calendly link]
+
+[Name]</div>
+    <div class="email-foot">// One real news item. No pitch language. Klaviyo behavioral segmentation tracks opens and Calendly clicks. Any click auto-routes to Assessment Booked flow.</div>
+    <div class="klav-strip"><span class="klav-pip">KLAVIYO</span>Behavioral segmentation active - Calendly click triggers Assessment Booked flow automatically</div>
+  </div>
+</div>
+
+
+<!-- ███ [08] CALL SCRIPTS ███ -->
+<div id="sec-scripts" class="sec">
+  <div class="pg-kicker">Sales Playbooks - 08</div>
+  <h1 class="pg-title">Be a human first.<br><em>Then be a salesperson.</em></h1>
+  <p class="pg-body">The operator calls because they have information that genuinely protects the prospect. That is true. Act like it. Operational framing beats regulatory framing by 23% in connect rate (Gong.io).</p>
+
+  <h2>Gatekeeper script</h2>
+  <p class="aside">// Operational framing, not regulatory. 23% higher connect rate (Gong.io).</p>
+  <div class="script-line">"Hi, quick question. I am trying to reach whoever handles technology and cybersecurity at the dealership. Is that the GM or the owner directly?"</div>
+  <div class="branch"><strong>If asked what it is about:</strong> "We work with South Florida dealerships on FTC data security compliance. There is a federal rule that changed in 2023. Fines run up to $53,000 per violation, per day. I want to make sure the right person has that information. Can I get them for 90 seconds?"</div>
+  <div class="branch"><strong>If blocked, "We have IT handled":</strong> "That is great, and this is different from IT support. It is a specific federal compliance requirement and most dealers with IT in place still have 2-3 documentation gaps. Can I speak to the owner for two minutes?"</div>
+  <div class="branch"><strong>If fully blocked, get email:</strong> "Could I get the best email for the GM or owner? I will send a 2-page FTC checklist they can review on their own time." Log in GHL immediately. Add contact to Smartlead Day 1 sequence via Apollo import if not already in system.</div>
+
+  <div class="hr"></div>
+  <h2>Decision maker script</h2>
+  <p class="aside">// "Per day" is the pivot. Named local peer is 2x more motivating than abstract statistic. Let the number land before continuing.</p>
+  <div class="script-line">"Hi [NAME], I am [OPERATOR] with [COMPANY]. We are the IT compliance specialists for South Florida dealerships."</div>
+  <p class="aside">// Pause. Identity first, pitch second.</p>
+  <div class="script-line">"Reason I am calling: we just wrapped an assessment for a dealership in [nearby WPB area - pulled from Apollo geography] and they had three compliance gaps they did not know about. One would have triggered an FTC fine of up to $53,000 per day for ongoing non-compliance."</div>
+  <p class="aside">// "Per day." Let it land. Two seconds of silence is correct.</p>
+  <div class="script-line">"The Safeguards Rule updated in June 2023 and added a new breach reporting requirement in May 2024. Most dealers in Palm Beach County are still behind on both. We offer a free 30-minute remote assessment - at the end you have a written compliance report in hand."</div>
+  <div class="script-line">"Would it be worth 30 minutes this week to see where [Dealership Name] stands?"</div>
+  <div class="branch"><strong>If YES:</strong> "Three parts, all remote. Test emails to 3-5 of your staff, they just click a link. Then a 30-minute Teams call. That is it. I am sending the booking link right now. Does Tuesday or Wednesday work better?" Book immediately. Log outcome in GHL.</div>
+  <div class="branch"><strong>"Send me information first":</strong> "Absolutely. Best email? And while I have you - what day this week works for a call? I will include a slot when I send the info over." Get email plus tentative day. Log everything in GHL immediately. Add to Smartlead if not already in sequence.</div>
+</div>
+
+
+<!-- ███ [09] OBJECTIONS ███ -->
+<div id="sec-objections" class="sec">
+  <div class="pg-kicker">Sales Playbooks - 09</div>
+  <h1 class="pg-title">Acknowledge.<br><em>Pivot. Ask again.</em></h1>
+  <p class="pg-body">Never argue. Never get defensive. The free assessment removes all risk. Structure: acknowledge genuinely, add one specific fact, redirect to the zero-cost assessment. Always end with a question.</p>
+  <div class="card">
+    <div class="obj"><div class="obj-q">We already have IT support</div><div class="obj-a">"IT support and FTC compliance documentation are two different things. Most IT providers keep systems running but have not built out the 9 specific FTC requirements: written risk assessment, MFA documentation, incident response plan, vendor agreements. Our assessment takes 30 minutes and either confirms you are covered or shows exactly what is missing. Would this week work?"</div><div class="obj-note">// 68% of SMB IT providers do not offer FTC-specific compliance documentation (CompTIA 2024)</div></div>
+    <div class="obj"><div class="obj-q">Not worried about it</div><div class="obj-a">"The FTC has been auditing compliance documentation without a breach trigger since 2023. Florida is one of the most active enforcement states. The assessment is free, takes 30 minutes, and worst case gives you written documentation proving you are already covered. Nothing to lose in knowing."</div></div>
+    <div class="obj"><div class="obj-q">Cannot afford it right now</div><div class="obj-a">"The assessment is completely free - no cost, no commitment. One FTC violation at $53,000 per day makes a monthly managed service look very affordable by comparison. But we are not there yet. Let us find out if you are actually at risk first."</div></div>
+    <div class="obj"><div class="obj-q">Call me back in a few months</div><div class="obj-a">"Before I let you go - quick question: do you currently have a written incident response plan on file? [Pause.] That is the first thing an FTC audit looks for and if it is not in place today it will not be in place in a few months. Can we do the free assessment now so you know where you actually stand?"</div><div class="obj-note">// The question gets them to self-disclose a gap they did not intend to reveal</div></div>
+    <div class="obj"><div class="obj-q">Just email me</div><div class="obj-a">"Absolutely. Best email? And to make it useful rather than generic - when was your last formal security risk assessment? I will tailor the email to that specifically and include a booking link so you can pick a time that works."</div></div>
+    <div class="obj"><div class="obj-q">How do I know you are legitimate</div><div class="obj-a">"Completely fair. We have been serving South Florida businesses for [X years]. I can send credentials and a sample compliance report right now. The assessment is free with no obligation - nothing to lose in checking us out."</div></div>
+    <div class="obj"><div class="obj-q">We already did this last year</div><div class="obj-a">"That puts you ahead of most dealers. What we want to confirm is whether that assessment covered the June 2023 updates and the May 2024 breach reporting rule. Any assessment before those dates almost certainly has gaps. Takes 30 minutes to confirm you are still current."</div></div>
+    <div class="obj"><div class="obj-q">Need to talk to my attorney</div><div class="obj-a">"Your attorney will thank you for having the assessment data - it gives them something concrete to review. Can we schedule the assessment for this week so you have the report ready for that conversation?"</div></div>
+  </div>
+</div>
+
+
+<!-- ███ [10] CLOSER ███ -->
+<div id="sec-closer" class="sec">
+  <div class="pg-kicker">Sales Playbooks - 10</div>
+  <h1 class="pg-title">30 minutes.<br><em>One decision.</em></h1>
+  <div class="note note-green"><div><span class="note-title">Speed-to-lead rule</span>Responding to a booked meeting within 5 minutes is 21x more likely to result in a close vs. waiting 30 minutes (HubSpot 2024). The client gets a real-time SMS alert the moment a meeting books in Calendly. They should pull the contact's GHL record immediately: company name, DMS/software, prior touchpoints, top objection raised on the call, and any compliance notes from the operator.</span></div></div>
+  <div class="card">
+    <div class="closer-row"><div class="closer-time">Min 0-5</div><div class="closer-body"><strong>Rapport and agenda.</strong> "Today I want to walk you through 3 parts of the assessment, share what we are seeing across Palm Beach County, and give you the compliance report at the end. About 30 minutes. Sound good?"<div class="closer-note">Do not pitch anything yet. The report closes. You are the guide.</div></div></div>
+    <div class="closer-row"><div class="closer-time">Min 5-10</div><div class="closer-body"><strong>Phishing simulation reveal.</strong> Walk through which staff clicked the test link. Name names. "If this were a real attack, an actor now has [person's] credentials." Let it land. Do not rush past the silence.<div class="closer-note">This moment is the emotional peak of the call. Silence is the right move here.</div></div></div>
+    <div class="closer-row"><div class="closer-time">Min 10-20</div><div class="closer-body"><strong>The four questions.</strong> Ask and document each in real time: MFA on all systems? Written incident response plan? Date of last formal risk assessment? Vendor cybersecurity agreements in place? Each "no" or "not sure" is a logged gap. Do not react - just document.<div class="closer-note">"Got it" - not "Oh, that is a problem." The report will show the problem.</div></div></div>
+    <div class="closer-row"><div class="closer-time">Min 20-25</div><div class="closer-body"><strong>Compliance report reveal.</strong> Share screen. Walk through gap count, severity levels, and the math: gaps x $53,088/day x 30 days = potential exposure. Make it specific and dollar-specific.<div class="closer-note">"3 critical gaps. $53k per day for 30 days is $4.77M in potential exposure. We close all three for less than one month of that risk."</div></div></div>
+    <div class="closer-row"><div class="closer-time">Min 25-30</div><div class="closer-body"><strong>Two-option close.</strong> Option A: Compliance tier, $500-1,200/mo - documentation, assessments, incident response plan, vendor agreements. Option B: Full MSP, $125-200/user/mo - everything in A plus full managed IT and 24/7 monitoring. "Most Palm Beach dealers start with Option B because it is the only one that actually eliminates the risk rather than documenting it. Which makes more sense for you?"<div class="closer-note">Two options = anchoring. Never one. The comparison makes Option A feel conservative and Option B feel logical.</div></div></div>
+  </div>
+</div>
+
+
+<!-- ███ [11] GHL LOGGING ███ -->
+<div id="sec-ghl" class="sec">
+  <div class="pg-kicker">Pipeline + Ops - 11</div>
+  <h1 class="pg-title">Every touchpoint.<br><em>All logged to GHL.</em></h1>
+  <p class="pg-body">Apollo auto-creates the initial record. The operator enriches it on first contact. Every subsequent call, email open, click, visit, meeting, and outcome logs automatically. The client sees a complete picture of every prospect before every conversation.</p>
+
+  <div class="note note-mist">
+    <div><span class="note-title">What gets logged automatically vs manually</span>Apollo auto-populates: name, title, company, phone, email, LinkedIn, address, company size, tech stack. Smartlead auto-logs: every send, open, click, and reply with timestamp. PhoneBurner auto-logs: every call with recording link and disposition. Calendly auto-logs: every booking. GHL automations auto-log: every stage change and tag applied. The operator manually adds: call notes, objection raised, and referral contacts collected on each call.</div>
+  </div>
+
+  <div class="card">
+    <div class="f-section-head">Identity + Contact Info</div>
+    <div class="form-grid fg2" style="margin-top:1px">
+      <div><label class="f-label">First name</label><input class="f-input" type="text" placeholder="e.g. Michael"></div>
+      <div><label class="f-label">Last name</label><input class="f-input" type="text" placeholder="e.g. Torres"></div>
+      <div><label class="f-label">Title / role</label><input class="f-input" type="text" placeholder="e.g. General Manager"></div>
+      <div><label class="f-label">Decision maker level</label><select class="f-input f-select"><option>Owner / Dealer Principal</option><option>General Manager</option><option>IT Director</option><option>Controller / CFO</option><option>Office Manager</option><option>Other - specify in notes</option></select></div>
+      <div><label class="f-label">Direct phone</label><input class="f-input" type="tel" placeholder="(561) 555-0100"></div>
+      <div><label class="f-label">Mobile</label><input class="f-input" type="tel" placeholder="(561) 555-0101"></div>
+      <div><label class="f-label">Work email</label><input class="f-input" type="email" placeholder="michael@dealership.com"></div>
+      <div><label class="f-label">Personal email (if known)</label><input class="f-input" type="email" placeholder="michael@gmail.com"></div>
+      <div><label class="f-label">LinkedIn URL (Apollo auto-fills)</label><input class="f-input" type="url" placeholder="linkedin.com/in/michaeltorres"></div>
+      <div><label class="f-label">Preferred contact method</label><select class="f-input f-select"><option>Phone call</option><option>Email</option><option>Text / SMS</option><option>In-person / walk-in</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="f-section-head">Business Info (Apollo auto-fills, operator verifies)</div>
+    <div class="form-grid fg2" style="margin-top:1px">
+      <div><label class="f-label">Business name</label><input class="f-input" type="text" placeholder="e.g. Palm Beach Toyota"></div>
+      <div><label class="f-label">Vertical</label><select class="f-input f-select"><option>Franchised auto dealer</option><option>Independent auto dealer</option><option>Medical / dental practice</option><option>CPA / accounting firm</option><option>Financial advisor / RIA</option><option>Law firm</option><option>Insurance agency</option><option>Real estate / broker</option><option>Other</option></select></div>
+      <div><label class="f-label">Website</label><input class="f-input" type="url" placeholder="https://palmbchtoyota.com"></div>
+      <div><label class="f-label">DMS or practice management software</label><input class="f-input" type="text" placeholder="e.g. CDK, Reynolds, Dealertrack, Dentrix"></div>
+      <div><label class="f-label">Street address (Apollo auto-fills)</label><input class="f-input" type="text" placeholder="123 Okeechobee Blvd"></div>
+      <div><label class="f-label">City / state / zip</label><input class="f-input" type="text" placeholder="West Palm Beach, FL 33401"></div>
+      <div><label class="f-label">Employee count (Apollo auto-fills)</label><select class="f-input f-select"><option>1-10</option><option>11-25</option><option>26-50</option><option>51-100</option><option>101-200</option><option>200+</option></select></div>
+      <div><label class="f-label">Years in business</label><select class="f-input f-select"><option>Unknown</option><option>Under 2 years</option><option>2-5 years</option><option>5-10 years</option><option>10-20 years</option><option>20+ years</option></select></div>
+      <div><label class="f-label">Parent company / dealer group</label><input class="f-input" type="text" placeholder="e.g. AutoNation, Penske, or independent"></div>
+      <div><label class="f-label">Source</label><select class="f-input f-select"><option>Apollo cold outreach (auto-created)</option><option>Email sequence reply</option><option>Cold call - operator</option><option>Pavement / walk-in</option><option>Referral from client</option><option>Referral from prospect</option><option>Inbound inquiry</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="f-section-head">Financial Qualifiers (verify on first call)</div>
+    <div class="form-grid fg2" style="margin-top:1px">
+      <div><label class="f-label">Annual revenue estimate</label><select class="f-input f-select"><option>Unknown</option><option>Under $1M</option><option>$1M-$5M</option><option>$5M-$20M</option><option>$20M-$100M</option><option>$100M+</option></select></div>
+      <div><label class="f-label">Offers financing / credit to customers?</label><select class="f-input f-select"><option>Yes - FTC Safeguards applies</option><option>No - Safeguards may not apply</option><option>Unknown - verify on call</option></select></div>
+      <div><label class="f-label">Current monthly IT spend (estimate)</label><select class="f-input f-select"><option>Unknown</option><option>None / DIY</option><option>Under $500</option><option>$500-$2,000</option><option>$2,000-$5,000</option><option>$5,000+</option></select></div>
+      <div><label class="f-label">Current IT provider name</label><input class="f-input" type="text" placeholder="e.g. CDK, Reynolds, local MSP, or none"></div>
+      <div><label class="f-label">IT contract end date (if known)</label><input class="f-input" type="text" placeholder="e.g. March 2026, month-to-month, unknown"></div>
+      <div><label class="f-label">Compliance budget status</label><select class="f-input f-select"><option>No budget allocated</option><option>Actively researching options</option><option>Budget approved and ready</option><option>Unknown</option></select></div>
+      <div><label class="f-label">Has cyber insurance?</label><select class="f-input f-select"><option>Yes - covered</option><option>No - uninsured</option><option>Unknown</option></select></div>
+      <div><label class="f-label">Insurance provider (if known)</label><input class="f-input" type="text" placeholder="e.g. Chubb, Travelers, or unknown"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="f-section-head">Compliance Status (update after every touchpoint)</div>
+    <div class="form-grid fg2" style="margin-top:1px">
+      <div><label class="f-label">Last formal compliance assessment</label><select class="f-input f-select"><option>Never / unknown</option><option>Before June 2023 - outdated, gaps guaranteed</option><option>June 2023 to May 2024 - partially outdated</option><option>After May 2024 - may be current</option></select></div>
+      <div><label class="f-label">Written incident response plan?</label><select class="f-input f-select"><option>No / unknown - critical gap</option><option>Informal / verbal only - gap</option><option>Formal written plan on file</option></select></div>
+      <div><label class="f-label">MFA on all customer-data systems?</label><select class="f-input f-select"><option>No - critical gap</option><option>Partial deployment - gap</option><option>Yes, fully deployed</option><option>Unknown - verify on call</option></select></div>
+      <div><label class="f-label">Written vendor security agreements?</label><select class="f-input f-select"><option>No - gap</option><option>Some vendors only - partial gap</option><option>All vendors covered</option><option>Unknown</option></select></div>
+      <div><label class="f-label">Employee cybersecurity training?</label><select class="f-input f-select"><option>None</option><option>Informal / ad hoc only</option><option>Annual formal training program</option><option>Unknown</option></select></div>
+      <div><label class="f-label">Device encryption on all endpoints?</label><select class="f-input f-select"><option>No</option><option>Partial</option><option>Yes, all devices</option><option>Unknown</option></select></div>
+      <div><label class="f-label">Overall risk assessment</label><select class="f-input f-select"><option>Unknown - assess first</option><option>Low (1 minor gap)</option><option>Medium (2-3 gaps)</option><option>High (4+ gaps)</option><option>Critical - major violations likely</option></select></div>
+      <div><label class="f-label">Number of critical gaps found (post-assessment)</label><input class="f-input" type="number" placeholder="0" min="0" max="9"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="f-section-head">Meeting + Interaction Log</div>
+    <div class="form-grid" style="margin-top:1px">
+      <div><label class="f-label">Operator call notes</label><textarea class="f-input f-ta" style="min-height:90px" placeholder="e.g. Called 3/25 at 10:15am from 561 local number. Reached GM Michael Torres on first attempt. Duration: 3 min 42 sec. Was polite but busy - their Reynolds DMS contract just renewed last month. Said they have IT covered. Used IT vs compliance rebuttal. DM agreed to receive FTC checklist email. Best callback: Thursday 9am. Tone: warm but skeptical. Did not book but was not hostile."></textarea></div>
+      <div><label class="f-label">Discovery call notes (filled in after assessment)</label><textarea class="f-input f-ta" style="min-height:90px" placeholder="e.g. Assessment call 3/28 at 2PM via Teams. Attendees: Michael Torres (GM) and Sara Chen (Office Manager). Duration 34 min. Gaps found: 4 critical. No incident response plan. MFA not enabled on DMS. No vendor agreements with 3 financing lenders. No employee phishing training - 2 of 5 staff clicked test email. Michael was most concerned about lender agreements. Verbal interest in Option B. Proposal sent same day at 4:15pm."></textarea></div>
+      <div class="form-grid fg2">
+        <div><label class="f-label">Email engagement status</label><select class="f-input f-select"><option>No opens yet</option><option>Opened Email 1 only</option><option>Opened multiple emails</option><option>Clicked Calendly link</option><option>Replied to sequence</option><option>Replied and booked</option><option>Unsubscribed</option></select></div>
+        <div><label class="f-label">Last contact date</label><input class="f-input" type="date"></div>
+        <div><label class="f-label">Next scheduled touchpoint</label><input class="f-input" type="date"></div>
+        <div><label class="f-label">Next action</label><select class="f-input f-select"><option>Send Day 1 email</option><option>Send Day 4 email</option><option>Send Day 7 email</option><option>Send Day 11 breakup email</option><option>Follow-up call</option><option>Send proposal</option><option>Send contract</option><option>Monthly Klaviyo nurture</option><option>90-day re-engage</option><option>No further action</option></select></div>
+        <div><label class="f-label">Top objection raised</label><select class="f-input f-select"><option>None raised yet</option><option>Already have IT support</option><option>Not worried about compliance</option><option>Cannot afford it</option><option>Call back later</option><option>Email only</option><option>Legitimacy question</option><option>Did assessment last year</option><option>Need attorney approval</option><option>Other - see call notes</option></select></div>
+        <div><label class="f-label">Pipeline stage</label><select class="f-input f-select"><option>New lead (Apollo import)</option><option>Contacted - call attempted</option><option>Contacted - email only</option><option>Engaged - replied or opened 3+</option><option>Assessment booked</option><option>Assessment complete</option><option>Proposal sent</option><option>Negotiating - verbal yes</option><option>Closed won</option><option>Closed lost</option><option>Nurture - Klaviyo monthly</option><option>Do not contact</option></select></div>
+      </div>
+      <div><label class="f-label">Referrals collected from this contact</label><input class="f-input" type="text" placeholder="e.g. Michael referred us to John Ramos, Service Director at INFINITI WPB - added as new GHL contact 3/25, added to Apollo filter for outreach"></div>
+    </div>
+    <button class="ghl-submit" onclick="submitGHL()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+      Log to GoHighLevel
+    </button>
+    <div class="ghl-success" id="ghl-ok">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Contact logged. Pipeline updated. Sequence check complete.
+    </div>
+  </div>
+
+  <h3>Automated activity log - every touchpoint recorded</h3>
+  <div class="log-entry"><span class="log-time">Today 9:14am</span><span><span class="tag tr">Call</span></span><div class="log-body">Operator called Michael Torres, GM at Palm Beach Toyota. Reached DM on first attempt. Duration: 3 min 42 sec. Objection: already has IT. Used IT vs compliance rebuttal. Agreed to receive checklist email. Callback Thursday 9am. Stage: Contacted. Smartlead Day 1 sequence confirmed active.</div></div>
+  <div class="log-entry"><span class="log-time">Today 10:02am</span><span><span class="tag tg">Email sent</span></span><div class="log-body">Email 1 delivered via Smartlead. Subject: quick heads up for Palm Beach Toyota. Claude Haiku personalization used financing angle. Delivered. No open yet. Day 4 follow-up queued for Friday 9:30am.</div></div>
+  <div class="log-entry"><span class="log-time">Today 11:44am</span><span><span class="tag tg">Email open</span></span><div class="log-body">Email 1 opened by michael@palmbchtoyota.com. Device: desktop. Location: West Palm Beach, FL. Open count: 1. No click or reply yet. GHL warm watch tag applied. Operator Slack alert: "Michael at Palm Beach Toyota opened Email 1 - 11:44am."</div></div>
+  <div class="log-entry"><span class="log-time">Today 2:30pm</span><span><span class="tag tm">Visit</span></span><div class="log-body">Friday pavement route. Operator visited Palm Beach Toyota in person. Dropped FTC one-pager with QR to Calendly. Spoke with receptionist Angela Martinez. New GHL contact created: Angela Martinez, Receptionist, (561) 555-0200. Apollo checked - not in current filter. Added to Day 1 sequence manually.</div></div>
+  <div class="log-entry"><span class="log-time">Yesterday 3:18pm</span><span><span class="tag tg">Reply + booked</span></span><div class="log-body">Michael replied to Email 3: "We had a breach scare last year and want to know where we stand." GHL tagged Hot. Slack alert fired within 90 sec. Claude Sonnet pulled GHL profile (Reynolds DMS, IT provider, prior call notes) and drafted personalized reply. Operator approved and sent at 3:24pm with Calendly. Michael booked Thursday 2PM. Client SMS alert sent. Klaviyo Assessment Booked flow triggered via Zapier.</div></div>
+  <div class="log-entry"><span class="log-time">Last Thursday</span><span><span class="tag tv">Meeting</span></span><div class="log-body">Assessment via Teams. Attendees: Michael Torres, GM and Sara Chen, Office Manager. Duration: 34 min. Gaps: 4 critical. Staff who clicked phishing test: 2 of 5. Michael most concerned about lender vendor agreements gap. Compliance report presented at 2:41pm. Verbal interest in Option B. Proposal generated by Claude Sonnet, sent at 4:15pm same day.</div></div>
+  <div class="log-entry"><span class="log-time">Last Friday</span><span><span class="tag tr">Closed won</span></span><div class="log-body">Contract signed via DocuSign. Option B: Full MSP. 18 users at $155/user/month. MRR added: $2,790. Contract start: April 1. Delivery team notified via Slack. Stage: Closed Won. Klaviyo Closed Won flow triggered - onboarding sequence begins. Referral ask scheduled for Day 90.</div></div>
+</div>
+
+
+<!-- ███ [12] DAILY SOP ███ -->
+<div id="sec-workflow" class="sec">
+  <div class="pg-kicker">Pipeline + Ops - 12</div>
+  <h1 class="pg-title">What runs.<br><em>When it runs.</em></h1>
+  <div class="g2">
+    <div class="card card-green">
+      <h3 style="color:var(--green)">Automated - zero human input</h3>
+      <div class="props" style="margin-bottom:0">
+        <div class="prop" style="background:transparent"><div class="prop-key" style="background:transparent">Nightly</div><div class="prop-val" style="background:transparent">Apollo filter runs. 50-100 new contacts exported to Smartlead and GHL. NeverBounce verification. AI personalization generated.</div></div>
+        <div class="prop" style="background:transparent"><div class="prop-key" style="background:transparent">Daily sends</div><div class="prop-val" style="background:transparent">Smartlead sequences fire per schedule. All opens, clicks, and replies logged to GHL with timestamps.</div></div>
+        <div class="prop" style="background:transparent"><div class="prop-key" style="background:transparent">Reply detected</div><div class="prop-val" style="background:transparent">Hot tag - Slack alert - Claude Sonnet drafts reply - operator approves</div></div>
+        <div class="prop" style="background:transparent"><div class="prop-key" style="background:transparent">Meeting booked</div><div class="prop-val" style="background:transparent">Calendly - GHL stage update - client SMS - Klaviyo flow triggers</div></div>
+        <div class="prop" style="background:transparent;border-bottom:none"><div class="prop-key" style="background:transparent">Day 14 no reply</div><div class="prop-val" style="background:transparent">Nurture tag - Smartlead exit - Klaviyo monthly sequence begins</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Operator schedule (~40 min non-dial time)</h3>
+      <div class="props" style="margin-bottom:0">
+        <div class="prop"><div class="prop-key" style="color:var(--rust)">7:45 AM</div><div class="prop-val">Check Smartlead. Flag hot replies. Confirm Apollo export ran. 5 min.</div></div>
+        <div class="prop"><div class="prop-key" style="color:var(--rust)">8:00 AM</div><div class="prop-val">Load call list in PhoneBurner from GHL queue. Coach tab open. 10 min.</div></div>
+        <div class="prop"><div class="prop-key" style="color:var(--rust)">8:30-12:30</div><div class="prop-val">Dial block 1. 60 calls. Coach tab open on second monitor throughout.</div></div>
+        <div class="prop"><div class="prop-key" style="color:var(--rust)">12:30-1:00</div><div class="prop-val">Log dispositions in GHL. Approve Claude email drafts from morning calls. Client check-in.</div></div>
+        <div class="prop"><div class="prop-key" style="color:var(--rust)">1:00-4:30</div><div class="prop-val">Dial block 2. 40 calls. Work callbacks. Route hot replies immediately.</div></div>
+        <div class="prop" style="border-bottom:none"><div class="prop-key" style="color:var(--rust)">4:30 PM</div><div class="prop-val">EOD GHL audit. Approve remaining Claude drafts. Report top objection to team via Slack.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ███ [13] OPERATOR CHECKLIST ███ -->
+<div id="sec-onboarding" class="sec">
+  <div class="pg-kicker">Pipeline + Ops - 13</div>
+  <h1 class="pg-title">Day one.<br><em>Everything needed.</em></h1>
+
+  <h3>Access + orientation</h3>
+  <div class="card">
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Log into all platforms: GHL, Smartlead, PhoneBurner, Calendly</div><div class="check-sub">Enable 2FA on every account. Apollo access is implementation team only. Credentials sent in onboarding email.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Watch all 6-8 Loom training videos</div><div class="check-sub">System overview, GHL tour, Smartlead dashboard, coach tool, PhoneBurner setup, pavement route guide. Watch in order.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Connect phone and Slack to GHL real-time notifications</div><div class="check-sub">Settings then Notifications. Add mobile number AND Slack channel. Hot lead alerts must arrive in real time, not batched.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Open the Claude objection coach and test 3 objections out loud before going live</div><div class="check-sub">This tab stays open during every call session. Practice until rebuttals feel automatic, not read.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Read both call scripts out loud twice and all 8 objection rebuttals</div><div class="check-sub">Know them cold. You will not be reading from a screen while a decision maker is on the line.</div></div></div>
+  </div>
+
+  <h3>Week 1 - Active launch</h3>
+  <div class="card">
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Complete 30-min live objection drill with implementation team on video call</div><div class="check-sub">Implementation team plays the DM. Operator uses the coach tool. Every objection run at least twice. Record the session.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Load first 200-contact call list in PhoneBurner from GHL (Apollo-sourced)</div><div class="check-sub">Priority order: email replies who did not book, fresh Apollo exports with 3+ email opens, no-answer re-queues. Never call a contact inside an active Smartlead sequence without checking first.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Ramp at 50 dials per day this week</div><div class="check-sub">Full 100 dials per day starts week 2. Log every disposition in GHL. Report top objection of the day to team via Slack before 5pm.</div></div></div>
+    <div class="check-row" onclick="ck(this)"><div class="check-box"></div><div><div class="check-label">Complete first Friday pavement route - Okeechobee Blvd corridor</div><div class="check-sub">8-10 stops. Drop one-pager with QR to Calendly. Collect at least 2 new contact names. Add each to GHL immediately after the route.</div></div></div>
+  </div>
+
+  <h3>Escalation triggers - alert the implementation team immediately if:</h3>
+  <div class="card">
+    <div class="check-row"><div class="check-box done"></div><div><div class="check-label">Email bounce rate exceeds 3% - pause campaign and alert team</div></div></div>
+    <div class="check-row"><div class="check-box done"></div><div><div class="check-label">3 consecutive days with zero meeting bookings - system review needed</div></div></div>
+    <div class="check-row"><div class="check-box done"></div><div><div class="check-label">Prospect requests pricing, proposal, or demo - route to client same day</div></div></div>
+    <div class="check-row"><div class="check-box done"></div><div><div class="check-label">Any legal or regulatory question from a prospect - client only, not operator</div></div></div>
+    <div class="check-row"><div class="check-box done"></div><div><div class="check-label">Booked meeting no-shows twice - move to Klaviyo 30-day re-engage, log reason in GHL</div></div></div>
+  </div>
+</div>
+
+
+<!-- ███ [14] BUDGET ███ -->
+<div id="sec-budget" class="sec">
+  <div class="pg-kicker">Pipeline + Ops - 14</div>
+  <h1 class="pg-title">One close.<br><em>Entire system paid.</em></h1>
+  <div class="g2">
+    <div class="card">
+      <h3>Monthly operating cost - Phase 1</h3>
+      <div class="cr"><span class="cr-n">Full tech stack (Apollo, Smartlead, GHL, Klaviyo, PhoneBurner, NeverBounce, sending domains, Zapier, Claude API + Pro)</span><span class="cr-v">$483-562</span></div>
+      <div class="cr"><span class="cr-n">Operator</span><span class="cr-v">$2,500-3,500</span></div>
+      <div class="cr"><span class="cr-n">Management fee</span><span class="cr-v">$150</span></div>
+      <div class="cr" style="border-top:2px solid var(--border);margin-top:6px;padding-top:10px"><span class="cr-n" style="font-weight:600;color:var(--ink)">Total monthly</span><span class="cr-v" style="color:var(--rust);font-weight:500;font-size:13px">$3,133-$4,212</span></div>
+    </div>
+    <div class="card">
+      <h3>KPI targets - research-backed</h3>
+      <div class="cr"><span class="cr-n">Dials per day</span><span class="cr-v">100 - 4-5% connect<span class="src">Gartner</span></span></div>
+      <div class="cr"><span class="cr-n">Email open rate target</span><span class="cr-v">35%+<span class="src">Smartlead 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Email reply rate target</span><span class="cr-v">3-5%<span class="src">Instantly 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Top performer target</span><span class="cr-v">10%+<span class="src">Martal 2026</span></span></div>
+      <div class="cr"><span class="cr-n">Meetings per week</span><span class="cr-v">5-10 combined</span></div>
+      <div class="cr"><span class="cr-n">Assessment to close rate</span><span class="cr-v">45-65%<span class="src">Forrester</span></span></div>
+      <div class="cr"><span class="cr-n">Break-even close count</span><span class="cr-v">1 @ $3k MRR</span></div>
+      <div class="cr" style="border-bottom:none"><span class="cr-n">Gross margin at scale</span><span class="cr-v" style="color:var(--green);font-weight:500">65-80%</span></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ███ [15] LIVE COACH ███ -->
+<div id="sec-coach" class="sec">
+  <div class="pg-kicker">AI Tools - 15</div>
+  <h1 class="pg-title">Type the objection.<br><em>Say the rebuttal.</em></h1>
+  <p class="pg-body">Keep this tab open during every call session. Type any objection in plain language or tap a common one. Claude returns the exact rebuttal to say out loud in under 2 seconds. Practice for 30 minutes before the first dial session.</p>
+
+  <div class="note note-sand">
+    <div><span class="note-title">To enable live AI responses</span>Open this file in any text editor. Find YOUR_API_KEY_HERE and replace it with your Anthropic API key. Save and reopen. Until then the tool uses fully accurate pre-loaded fallback rebuttals.</div>
+  </div>
+
+  <div class="coach">
+    <div class="coach-top">
+      <div class="coach-badge">Live Coach - 15</div>
+      <div class="coach-headline">What did they just say?</div>
+    </div>
+    <div class="q-row">
+      <button class="q-pill" onclick="setQ('We already have IT support')">Already have IT</button>
+      <button class="q-pill" onclick="setQ('Not worried about compliance')">Not worried</button>
+      <button class="q-pill" onclick="setQ('Cannot afford it right now')">Cannot afford</button>
+      <button class="q-pill" onclick="setQ('Call me back in a few months')">Call back later</button>
+      <button class="q-pill" onclick="setQ('Just email me the information')">Email only</button>
+      <button class="q-pill" onclick="setQ('How do I know you are legitimate')">Legitimacy</button>
+      <button class="q-pill" onclick="setQ('We already did this last year')">Did it last year</button>
+      <button class="q-pill" onclick="setQ('Need to talk to my attorney first')">Talk to attorney</button>
+    </div>
+    <div class="coach-input-row">
+      <input class="coach-field" id="coachIn" type="text" placeholder="Type the objection in plain language..." onkeydown="if(event.key==='Enter')runCoach()">
+      <button class="coach-btn" id="coachBtn" onclick="runCoach()">Get rebuttal</button>
+    </div>
+    <div class="thinking" id="coachThink"><span>Thinking</span><div class="thinking-dots"><span></span><span></span><span></span></div></div>
+    <div class="coach-result" id="coachResult"></div>
+    <div class="offline-note" id="offlineNote">Offline mode - showing pre-loaded rebuttal. Add API key to enable live Claude responses.</div>
+  </div>
+</div>
+
+
+<!-- ███ [16] SCALE ███ -->
+<div id="sec-scale" class="sec">
+  <div class="pg-kicker">AI Tools - 16</div>
+  <h1 class="pg-title">Four phases.<br><em>Compounding revenue.</em></h1>
+
+  <div class="phase-card ph-sky"><div class="phase-top"><span class="phase-name">Phase 1 - Foundation <span style="font-size:11px;color:var(--ink-4);font-weight:400;margin-left:6px">Weeks 1-4</span></span><span class="phase-mrr">$0 to $5k MRR</span></div><div class="phase-body">1 operator, 1 client (salesperson), full tool stack. Two-platform email: Smartlead cold + Klaviyo warm. Monthly cost: $3,133-$4,212. Break-even at 1 close. Apollo auto-refreshes ICP contacts nightly without human input.</div></div>
+  <div class="phase-card ph-green"><div class="phase-top"><span class="phase-name">Phase 2 - Optimize <span style="font-size:11px;color:var(--ink-4);font-weight:400;margin-left:6px">Months 2-3</span></span><span class="phase-mrr">$5k to $15k MRR</span></div><div class="phase-body">Add Clay for AI hyper-personalization at scale ($149/mo). Double email volume with 3 additional warmed domains. Klaviyo upsell sequences active on all Closed Won clients. Apollo filter expanded to pull 100-150 contacts/night as list quality data improves.</div></div>
+  <div class="phase-card ph-rust"><div class="phase-top"><span class="phase-name">Phase 3 - Expand ICPs <span style="font-size:11px;color:var(--ink-4);font-weight:400;margin-left:6px">Months 4-5</span></span><span class="phase-mrr">$15k to $35k MRR</span></div><div class="phase-body">HIPAA and IRS WISP verticals live with dedicated Apollo filters, Smartlead sequences, and Klaviyo flows. 2,000+ new PBC contacts unlocked. Florida mainland Apollo filter expansion adds 16,000+ dealers across the state.</div></div>
+  <div class="phase-card ph-ink"><div class="phase-top"><span class="phase-name">Phase 4 - Autonomous <span style="font-size:11px;color:var(--ink-4);font-weight:400;margin-left:6px">Month 7+</span></span><span class="phase-mrr">$35k+ MRR</span></div><div class="phase-body">AI SDR tools supplement the dialing operator. Claude Cowork handles all reporting and document generation. Apollo + Smartlead + Klaviyo pipeline is largely self-running with 2-3 hours weekly oversight from the implementation team.</div></div>
+
+  <div class="hr"></div>
+  <h2>Implementation team agency model at scale</h2>
+  <div class="card">
+    <div class="props" style="margin-bottom:0">
+      <div class="prop"><div class="prop-key">Client 1 (current)</div><div class="prop-val">WPB IT compliance system. Setup complete. Implementation team in supervised ramp mode. This document is the operating manual.</div></div>
+      <div class="prop"><div class="prop-key">Clients 2-3</div><div class="prop-val">Same infrastructure, different brand variables and geography. New Apollo saved filters per vertical. Config time: 10-14 hours per client. API costs per client: $28-45/mo. Klaviyo per client: $20-65/mo.</div></div>
+      <div class="prop"><div class="prop-key">Clients 4-10</div><div class="prop-val">Claude Team Premium plan ($100/seat/mo annual, 5 seats = $500/mo) gives shared project workspaces per client, admin billing, SSO, and full Cowork access from one admin panel.</div></div>
+      <div class="prop"><div class="prop-key">Revenue per client</div><div class="prop-val">Setup fee: $3-8k one-time. Monthly retainer: $1-2.5k/mo. At 5 clients on retainer: $5-12.5k/mo recurring for the implementation team.</div></div>
+    </div>
+  </div>
+</div>
+
+
+</main>
+</div><!-- end .shell -->
+
+<script>
+/* Navigation */
+function go(id) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('sec-' + id);
+  if (el) el.classList.add('on');
+  event.currentTarget.classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+
+/* Checklist */
+function ck(row) {
+  row.querySelector('.check-box').classList.toggle('done');
+}
+
+/* GHL submit */
+function submitGHL() {
+  const btn = document.querySelector('.ghl-submit');
+  const ok = document.getElementById('ghl-ok');
+  btn.innerHTML = '<span>Logging...</span>';
+  btn.style.opacity = '.6';
+  setTimeout(() => {
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Logged to GoHighLevel';
+    btn.style.opacity = '1';
+    ok.classList.add('show');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg> Log to GoHighLevel';
+      ok.classList.remove('show');
+    }, 4000);
+  }, 1100);
+}
+
+/* Coach fallbacks */
+const FALLBACKS = {
+  'it': 'IT support and FTC compliance documentation are entirely different. Most IT providers keep systems running but have not built out the 9 specific FTC requirements: written risk assessment, MFA documentation, incident response plan, vendor agreements. Our assessment takes 30 minutes and either confirms you are covered or shows exactly what is missing. Would this week work?',
+  'worried': 'The FTC has been auditing compliance documentation without a breach trigger since 2023. Florida is one of the most active enforcement states. The assessment is free, 30 minutes, and worst case gives you written proof you are already covered. Nothing to lose in knowing.',
+  'afford': 'The assessment is completely free - no cost, no commitment. One FTC violation at $53,000 per day makes a monthly managed service look very affordable by comparison. But we are not there yet. Let us find out if you are actually at risk first.',
+  'month': 'Quick question before I let you go: do you currently have a written incident response plan on file? That is the first thing an FTC audit looks for and if it is not in place today it will not be in place in a few months. Can we do the free assessment now so you know where you stand?',
+  'email': 'Absolutely - best email? And to make it useful: when was your last formal security risk assessment? I will tailor the email to that specifically and include a booking link so you can pick a convenient time.',
+  'legit': 'Completely fair. We have been serving South Florida businesses for years. I can send credentials and a sample compliance report right now. The assessment is free with no obligation - nothing to lose.',
+  'last': 'That puts you ahead of most dealers. What we want to confirm is whether that assessment covered the June 2023 updates and the May 2024 breach reporting rule. Any assessment before those dates almost certainly has gaps. 30 minutes to confirm.',
+  'attorney': 'Your attorney will thank you for having the assessment data - it gives them something concrete to review. Can we schedule the assessment this week so you have the report ready for that conversation?'
+};
+
+function getFallback(q) {
+  const l = q.toLowerCase();
+  for (const [k, v] of Object.entries(FALLBACKS)) {
+    if (l.includes(k)) return v;
+  }
+  return 'The assessment is free and takes 30 minutes. You either find out you are covered and have written proof, or you find gaps you did not know about. Either way you are in a better position. Would this week work for a quick call?';
+}
+
+function setQ(t) {
+  document.getElementById('coachIn').value = t;
+  document.getElementById('coachIn').focus();
+}
+
+async function runCoach() {
+  const q = document.getElementById('coachIn').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('coachBtn');
+  const think = document.getElementById('coachThink');
+  const result = document.getElementById('coachResult');
+  const note = document.getElementById('offlineNote');
+
+  btn.disabled = true;
+  result.classList.remove('show');
+  think.classList.add('show');
+  note.style.display = 'none';
+
+  const KEY = 'YOUR_API_KEY_HERE';
+  if (KEY === 'YOUR_API_KEY_HERE') {
+    await new Promise(r => setTimeout(r, 820));
+    think.classList.remove('show');
+    result.textContent = getFallback(q);
+    result.classList.add('show');
+    note.style.display = 'block';
+    btn.disabled = false;
+    return;
+  }
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 180,
+        system: 'You are a live sales coach for an IT compliance company in West Palm Beach, Florida. The operator is on a cold call right now with a dealership decision maker. Give a natural rebuttal under 65 words to say out loud immediately. Always redirect to the free 30-minute FTC Compliance Assessment. Sound human and warm, not scripted. Key facts: $53,088 per violation per day, June 2023 FTC requirements update, May 2024 breach reporting rule, free assessment produces a written compliance report. End with one soft question. Return only the rebuttal text - no labels, no preamble.',
+        messages: [{ role: 'user', content: 'Objection: "' + q + '"\n\nRebuttal to say right now:' }]
+      })
+    });
+    const data = await resp.json();
+    think.classList.remove('show');
+    result.textContent = data.content?.[0]?.text || getFallback(q);
+    result.classList.add('show');
+  } catch (e) {
+    think.classList.remove('show');
+    result.textContent = getFallback(q);
+    result.classList.add('show');
+  }
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
